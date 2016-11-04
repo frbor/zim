@@ -8,7 +8,7 @@ if (( ! ${+commands[ssh-agent]} )); then
 fi
 
 # use a sane temp dir; creating 1k ssh-* files in /tmp is crazy
-if [[ ${TMPDIR} ]]; then
+if [[ -n ${TMPDIR} ]]; then
   local ssh_env=${TMPDIR}/ssh-agent.env
   local ssh_sock=${TMPDIR}/ssh-agent.sock
 else
