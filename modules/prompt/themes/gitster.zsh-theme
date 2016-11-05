@@ -4,7 +4,8 @@
 #
 
 gst_get_status() {
-  print "%(?:%F{10}➜:%F{9}➜%s)"
+  print "%(?::%F{9}! %s)"
+  #print "%(?:%F{10}➜:%F{9}➜%s)"
 }
 
 gst_get_pwd() {
@@ -17,13 +18,13 @@ gst_get_pwd() {
 prompt_context() {
   #if [[ ${USER} != ${DEFAULT_USER} || -n ${SSH_CONNECTION} ]]; then
   if [[ -n ${SSH_CONNECTION} ]]; then
-    print " %F{cyan}%(!.%{%F{blue}%}.)%m"
+    print " %F{cyan}%(!.%{%F{blue}%}.)%m "
     #print " %F{cyan}%(!.%{%F{blue}%}.)${USER}@%m"
   fi
 }
 
 prompt_gitster_precmd() {
-  PROMPT='$(gst_get_status)$(prompt_context) %F{grey}$(gst_get_pwd) $(git_prompt_info)%f'
+  PROMPT='$(gst_get_status)$(prompt_context)%F{cyan}$(gst_get_pwd) $(git_prompt_info)%f'
 }
 
 prompt_gitster_setup() {
