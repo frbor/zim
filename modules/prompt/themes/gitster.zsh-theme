@@ -3,10 +3,9 @@
 # https://github.com/shashankmehta/dotfiles/blob/master/thesetup/zsh/.oh-my-zsh/custom/themes/gitster.zsh-theme
 #
 
-gst_get_status() {
-  print "%(?::%F{9}! %s)"
-  #print "%(?:%F{10}➜:%F{9}➜%s)"
-}
+#gst_get_status() {
+#  print "%(?::%F{9}! %s)"
+#}
 
 gst_get_pwd() {
   prompt_short_dir="$(short_pwd)"
@@ -24,7 +23,7 @@ prompt_context() {
 }
 
 prompt_gitster_precmd() {
-  PROMPT='$(gst_get_status)$(prompt_context)%F{green}$(gst_get_pwd) $(git_prompt_info)%f'
+  PROMPT='$(prompt_context)%F{green}$(gst_get_pwd) $(git_prompt_info)%f'
 }
 
 prompt_gitster_setup() {
