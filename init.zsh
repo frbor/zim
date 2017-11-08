@@ -3,10 +3,12 @@
 #
 
 autoload -Uz is-at-least
-if ! is-at-least 5.2; then
-  print "ERROR: Zim didn't start. You're using zsh version ${ZSH_VERSION}, and versions < 5.2 are not supported. Update your zsh." >&2
-  return 1
-fi
+
+
+#if ! is-at-least 5.0; then
+  ####print "ERROR: Zim didn't start. You're using zsh version ${ZSH_VERSION}, and versions < 5.0 are not supported. Update your zsh." >&2
+  #return 1
+#fi
 
 # Define zim location
 (( ! ${+ZIM_HOME} )) && export ZIM_HOME="${ZDOTDIR:-${HOME}}/.zim"
