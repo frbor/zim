@@ -18,20 +18,6 @@ fpath=(${0:h}/external/src ${fpath})
 # load and initialize the completion system
 autoload -Uz compinit && compinit -C -d "${ZDOTDIR:-${HOME}}/${zcompdump_file:-.zcompdump}"
 
-# set any compdefs
-source ${0:h}/compdefs.zsh
-
-{
-  # zcomple the .zcompdump in the background
-  zcompdump=${ZDOTDIR:-${HOME}}/.zcompdump
-
-  if [[ -s ${zcompdump} && ( ! -s ${zcompdump}.zwc || ${zcompdump} -nt ${zcompdump}.zwc) ]]; then
-    zcompile ${zcompdump}
-  fi
-  
-  unset zcompdump
-} &!
-
 
 #
 # zsh options
@@ -41,21 +27,14 @@ source ${0:h}/compdefs.zsh
 # the cursor is moved to the end of the word
 setopt ALWAYS_TO_END
 
-# Automatically use menu completion after the second consecutive request for completion
-setopt AUTO_MENU
-
-# Automatically list choices on an ambiguous completion. 
-setopt AUTO_LIST
-
 # Perform a path search even on command names with slashes in them.
 setopt PATH_DIRS
 
-# Make globbing (filename generation) sensitive to case.
+# Make globbing (filename generation) not sensitive to case.
 unsetopt CASE_GLOB
 
-# On an ambiguous completion, instead of listing possibilities or beeping, insert the first match immediately.
-# Then when completion is requested again, remove the first match and insert the second match, etc.
-unsetopt MENU_COMPLETE
+# Don't beep on an ambiguous completion.
+unsetopt LIST_BEEP
 
 
 #
@@ -64,20 +43,23 @@ unsetopt MENU_COMPLETE
 
 # group matches and describe.
 zstyle ':completion:*:*:*:*:*' menu select
-zstyle ':completion:*:matches' group 'yes'
-zstyle ':completion:*:options' description 'yes'
+zstyle ':completion:*:matches' group yes
+zstyle ':completion:*:options' description yes
 zstyle ':completion:*:options' auto-description '%d'
-zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
-zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
-zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
-zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
-zstyle ':completion:*:default' list-prompt '%S%M matches%s'
-zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*:corrections' format '%F{green}-- %d (errors: %e) --%f'
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+zstyle ':completion:*:messages' format '%F{purple}-- %d --%f'
+zstyle ':completion:*:warnings' format '%F{red}-- no matches found --%f'
+zstyle ':completion:*' format '%F{yellow}-- %d --%f'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' verbose yes
-zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' '+r:|?=**'
 
 # directories
+if (( ! ${+LS_COLORS} )); then
+  # Locally use same LS_COLORS definition from utility module, in case it was not set
+  local LS_COLORS='di=1;34:ln=35:so=32:pi=33:ex=31:bd=1;36:cd=1;33:su=30;41:sg=30;46:tw=30;42:ow=30;43'
+fi
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
@@ -108,5 +90,7 @@ zstyle ':completion:*:history-words' menu yes
 zstyle ':completion:*:(rm|kill|diff):*' ignore-line other
 zstyle ':completion:*:rm:*' file-patterns '*:all-files'
 
-# smart editor completion
-zstyle ':completion:*:(nano|vim|nvim|vi|emacs|e):*' ignored-patterns '*.(wav|mp3|flac|ogg|mp4|avi|mkv|webm|iso|dmg|so|o|a|bin|exe|dll|pcap|7z|zip|tar|gz|bz2|rar|deb|pkg|gzip|pdf|mobi|epub|png|jpeg|jpg|gif)'
+# If the _my_hosts function is defined, it will be called to add the ssh hosts
+# completion, otherwise _ssh_hosts will fall through and read the ~/.ssh/config
+zstyle -e ':completion:*:*:ssh:*:my-accounts' users-hosts \
+  '[[ -f ${HOME}/.ssh/config && ${key} == hosts ]] && key=my_hosts reply=()'
